@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Bomberman</title>
+		<style>
+			canvas {
+				border: 1px solid black;
+			}
+			body{
+				width: 500px;
+				margin: auto;
+			}
+		</style>
+		<script src="Keyboard.js"></script>
+        <script src="ImageResources.js"></script>
+        <script src="Map.js"></script>
+        <script src="Bonus.js"></script>
+		<script src="Bomb.js"></script>
+        <script src="Fire.js"></script>
+        <script src="Player1.js"></script>
+        <script src="Player2.js"></script>
+    </head>
+	<body>
+		<h1>Bomberman</h1>
+
+		<canvas width="480" height="416">
+			Seu navegador não tem suporte ao canvas! Atualize seu navegador.
+		</canvas>
+
+		<script>
+            var debug = false;
+
+			var tela = document.getElementsByTagName("canvas")[0];
+			var ctx = tela.getContext("2d");
+
+			var fps = 40;
+			var dt = 1/fps;
+
+            var keyboard = new Keyboard();
+            //Images
+            var imageResources = new ImageResources();
+            imageResources.addImage("wsprite", "images/mapSprites.png");
+            imageResources.addImage("bomber", "images/Bomberman.png");
+			
+			//Audio
+			var bgAudio = new Audio("sounds/04-level-1.mp3");
+            bgAudio.loop = true;
+			bgAudio.play();
+			
+			var map = new Map();
+            var player1 = new Player1();
+            var player2 = new Player2();
+
+            var playing = true;
+
+			setInterval(function () {
+
+                player1.action();
+                player2.action();
+
+                //Bombs action
+                for(var bId in bombs) {
+                    if(bombs.hasOwnProperty(bId) && bombs[bId] != undefined){
+                        bombs[bId].action();
+                    }
+                }
+
+                //Fires action
+                for(var fId in fires) {
+                    if(fires.hasOwnProperty(fId) && fires[fId] != undefined){
+                        fires[fId].action();
+                    }
+                }
+
+                ctx.clearRect(0, 0, 480, 416);
+
+                map.draw();
+
+                //Bombs draw
+                for(var bId in bombs) {
+                    if(bombs.hasOwnProperty(bId) && bombs[bId] != undefined){
+                        bombs[bId].draw();
+                    }
+                }
+
+                //Bonus
+                for(var boId in bonuses) {
+                    if(bonuses.hasOwnProperty(boId) && bonuses[boId] != undefined){
+                        bonuses[boId].draw();
+                    }
+                }
+
+                //Fires draw
+                for(var fId in fires) {
+                    if(fires.hasOwnProperty(fId) && fires[fId] != undefined){
+                        fires[fId].draw();
+                    }
+                }
+
+                player1.draw();
+                player2.draw();
+
+                if(player1.dead || player2.dead) {
+                    this.playing = false;
+
+                    ctx.font = "50px Arial";
+                    ctx.fillStyle = "rgb(255, 255, 255)";
+                    if (player1.dead && player2.dead) {
+                        ctx.fillText('Empate!', 158, 220);
+                    } else if (player1.dead) {
+                        ctx.fillText('Player 2 ganhou!', 58, 220);
+                    } else if (player2.dead) {
+                        ctx.fillText('Player 1 ganhou!', 58, 220);
+                    }
+                }
+
+            }, 1000/fps);
+		</script>	
+	</body>
+</html>
